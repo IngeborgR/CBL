@@ -752,7 +752,7 @@ def evaluate_and_save(utterances):
                 if utterances.all[i].reconstructed:
                     controlledscore = np.math.log(np.math.factorial(n_chunks))
                 else:
-                    controlledscore = - np.math.log(np.math.factorial(n_chunks))
+                    controlledscore = np.math.log(1 - (1/np.math.factorial(n_chunks)))
             # if utterance was skipped, set all irrelevant variables to NaN
             else:
                 gold = 'NaN'
