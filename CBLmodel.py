@@ -1,4 +1,7 @@
+#!/usr/bin/env python2.7
+
 from __future__ import division
+import argparse
 import numpy as np
 import cPickle as pickle
 from random import shuffle
@@ -712,12 +715,9 @@ def determine_pc(chunkpair, chunkpairs):
     return 0
 
 # evaluates the reconstructed utterances and saves results in .csv file
-def evaluate_and_save(utterances):
+def evaluate_and_save(utterances, child, age, output_filename):
     # create outputfile with file header
-    outputfilename = child_file.replace('.txt', '_productiontask.csv')
-    outputfilename = outputfilename.replace('Data', 'results/noskipping')
-
-    with open(outputfilename, "w") as output:
+    with open(output_filename, "w") as output:
         writer = csv.writer(output, delimiter=";")
         header = ["num", "utterance", "child", "age", "skipped", "reconstructed", "bow", "gold", "prediction","chance","controlledscore"]
         writer.writerow(header)
@@ -763,55 +763,99 @@ def evaluate_and_save(utterances):
                 controlledscore = 'NaN'
 
             # write utterance data to output file
-            row = [str(num), str(utterance), str(CHILD), str(AGE), str(skip), str(reconstructed), str(bow), str(gold),
+            row = [str(num), str(utterance), child, age, str(skip), str(reconstructed), str(bow), str(gold),
                    str(prediction),str(chance),str(controlledscore)]
             writer.writerow(row)
-    print("Output written to file")
+    print("Wrote output to: {}".format(os.path.relpath(output_filename)))
     return
 
+def parse_arguments():
+    p = argparse.ArgumentParser(description="Run the model")
+    p.add_argument('--type', metavar='T', required=True,
+            choices=['c', 'l'],
+            help="'c' (cumulative) or 'l' (local)")
+    p.add_argument('--child', metavar='C', required=True,
+            choices=['Alex', 'Ethan', 'Lily', 'Naima', 'Violet', 'William'],
+            help="'Alex', 'Ethan', 'Lily', 'Naima', 'Violet', or 'William'")
+    p.add_argument('--age', metavar='A', required=True,
+            choices=['1_6', '2_0', '2_6', '3_0', '3_6', '4_0'],
+            help="'1_6', '2_0', '2_6', '3_0', '3_6', or '4_0'")
+    p.add_argument('--max-utterances', metavar='N', type=int,
+            help="train and test on up to N utterances")
+    return p.parse_args()
+
 if __name__ == "__main__":
-    #change path of location of corpusfiles
-    path = os.path.abspath('')
-    path = path.replace('/Model/Scripts','')
-    path = os.path.join(path, 'Data')
+    args = parse_arguments()
 
-    ##A DJUST THESE TO SELECT CORPUS DATA ###
-    TYPE = "a" # or "l"
-    CHILD = "Alex" # Choose between Alex, Ethan, Lily, Naima, Violet and William for Providence corpus, or ArtLg for Artificial Grammar
-    AGE = "2_6" #  Choose between 1_6, 2_0, 2_6, 3_0, 3_ or 4_0 for Providence corpus or NVT for Artificial Grammar
-    if TYPE == "a":
-        LOC = os.path.join(path, 'accumulativesampledcorpus')
-    elif TYPE == "l":
-        LOC = os.path.join(path, 'localsampledcorpus')
+    cwd = os.getcwd()
+    if args.type == "c":
+        LOC = os.path.join(cwd, 'cumulativesampledcorpus')
+    elif args.type == "l":
+        LOC = os.path.join(cwd, 'localsampledcorpus')
     else:
-        LOC = os.path.join(path, 'ArtCorpus')
+        raise ValueError('Unexpected type: {}'.format(args.type))
 
-    caregiver_filename =  LOC + "/" + TYPE + "_corpusProvidence_caregivers_" + CHILD + "_age" + AGE + ".txt" #"ArtLgCorpus.txt"
-    caregiver_size_filename =  LOC + "/" + TYPE + "_corpusProvidence_caregivers_size" + CHILD + "_age" + AGE + ".txt"  #"ArtLgCorpus_size.txt"
+    caregiver_filename =  os.path.join(LOC,
+            args.type +
+            "_corpusProvidence_caregivers_" + args.child +
+            "_age" + args.age +
+            ".txt")
 
-    child_file = LOC +  "/" + TYPE + "_corpusProvidence_child" + CHILD + "_age" + AGE + ".txt"  # or: "ArtLgcorpus_child.txt"
-    child_size_file = LOC + "/" + TYPE + "_corpusProvidence_child_size" + CHILD + "_age" + AGE + ".txt"  # or: "ArtLgcorpus_child_size.txt"
+    caregiver_size_filename = os.path.join(LOC,
+            args.type +
+            "_corpusProvidence_caregivers_size" + args.child +
+            "_age" + args.age +
+            ".txt")
 
-    print ('Start' + CHILD + AGE + TYPE)
+    child_filename = os.path.join(LOC,
+            args.type +
+            "_corpusProvidence_child" + args.child +
+            "_age" + args.age +
+            ".txt")
 
-    corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(caregiver_filename, caregiver_size_filename)
+    child_size_filename = os.path.join(LOC,
+            args.type +
+            "_corpusProvidence_child_size" + args.child +
+            "_age" + args.age +
+            ".txt")
+
+    output_filename = os.path.join(os.getcwd(), 'results',
+            args.type +
+            "_corpusProvidence_child" + args.child +
+            "_age" + args.age +
+            "_productiontask.csv")
+
+    print('{} {} {}'.format(args.child, args.age, args.type))
+
+    corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(
+            caregiver_filename, caregiver_size_filename)
+
     NUM_PAIRS = 2 * NUM_WORDS
     NUM_CHUNKS = NUM_PAIRS
     NUM_FRAMES = NUM_PAIRS
 
-    #NUM_UTTERANCES = min(200, NUM_UTTERANCES)  # for testing code with subset of data
-    print NUM_UTTERANCES
+    if (args.max_utterances):
+        NUM_UTTERANCES = min(args.max_utterances, NUM_UTTERANCES)
 
-    print("\nFile read")
+    print("NUM_UTTERANCES = {}".format(NUM_UTTERANCES))
+
+    print("Chunking...")
     chunks, chunkpairs, all = chunk_corpus(corpus)
-    print("\nChunking complete")
 
-    child_corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(child_file, child_size_file)
-    #NUM_UTTERANCES = min(200, NUM_UTTERANCES)  # for testing code with subset of data
+    child_corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(
+            child_filename, child_size_filename)
 
-    print("\nChild file read")
-    print NUM_UTTERANCES
+    if (args.max_utterances):
+        NUM_UTTERANCES = min(args.max_utterances, NUM_UTTERANCES)
+
+    print("NUM_UTTERANCES = {}".format(NUM_UTTERANCES))
+
+    print("Reconstructing utterances...")
+
     utterances = production_task(child_corpus, chunks, chunkpairs)
-    print("\nProduction task completed")
-    evaluate_and_save(utterances)
+
+    print("Utterance reconstruction complete")
+
+    evaluate_and_save(utterances, args.child, args.age, output_filename)
+
     print("Program done")
