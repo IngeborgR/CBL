@@ -60,21 +60,38 @@ class WordList:
 class ChunkList:
     def __init__(self):
         self.size = 0 # An integer-value, how many chunks are stored in the list
-        self.all = [] # List of Chunk-objects
+        self.max_chunk_length = 0
+        self.all = {} # Dictionary of Chunk-objects
+
+    def add_chunk(self, chunk):
+        chunk_key = tuple(chunk.ortho)
+        self.all[chunk_key] = chunk
+        self.max_chunk_length = max(self.max_chunk_length, len(chunk.ortho))
+        self.size += 1
+
+    def lookup(self, chunk):
+        chunk_key = tuple(chunk.ortho)
+        return self.all.get(chunk_key)
+
+    def lookup_by_key(self, word_sequence):
+        chunk_key = tuple(word_sequence)
+        return self.all.get(chunk_key)
 
     # counts how often pair is (part of) an already stored chunk
-    def count_chunk(self, pair):
+    def count_pair(self, pair):
+        pair_key = tuple(pair)
         count = 0
         match = None
-        for k in range(0, self.size - 1):
+        for chunk_key, chunk in self.all.iteritems():
             # check for perfect match of pair with chunk
-            if self.all[k].ortho == pair:
-                match = k
-                count = count + self.all[k].count
+            if chunk_key == pair_key:
+                match = chunk
+                count += chunk.count
             # check if pair is subset of stored chunk
-            elif findsubset(self.all[k].ortho, pair):
-                count = count + self.all[k].count
-                # count: how often the pair is (part of) a chunk, match: the chunk that exactly matches pair
+            elif findsubset(chunk_key, pair_key):
+                count += chunk.count
+        # count: how often the pair is (part of) a chunk,
+        # match: the chunk (if any) that exactly matches pair
         return count, match
 
 "class Chunk: "
@@ -491,8 +508,7 @@ def chunk_corpus(corpus):
                 if btp <= average:
                     # add chunk to chunk-array
                     chunk.count = 1
-                    chunks.all.append(chunk)
-                    chunks.size += 1
+                    chunks.add_chunk(chunk)
                     chunkpair = [previous_chunk, chunk]
                     c_count = chunkpairs.update_pairlist(chunkpair)
                     previous_chunk = chunk
@@ -503,26 +519,27 @@ def chunk_corpus(corpus):
             # when chunkatory is not empty
             else:
                 # count how often pair (is part of) an already stored chunk
-                count, match = chunks.count_chunk(pair)
+                count, matched_chunk = chunks.count_pair(pair)
                 # if pair has been seen at least twice before as (part of) a chunk
+                # TODO: The comment above and the condition below disagree.
+                # Should the condition be count >= 2?
                 if count > 2:
                     # no perfect match in the dictionary, but count is high enough
-                    if match is None:
+                    if matched_chunk is None:
                         # add chunk to chunkatory, and frame to frame dictionary
                         chunk.ortho = pair
                         chunk.count = 1
-                        chunks.all.append(chunk)
-                        chunks.size += 1
+                        chunks.add_chunk(chunk)
                         chunkpair = [previous_chunk, chunk]
                         c_count = chunkpairs.update_pairlist(chunkpair)
                         previous_chunk = chunk
                     # if perfect match was found
                     else:
                         # up count of existing matching chunk
-                        chunks.all[match].count += 1
+                        matched_chunk.count += 1
                         chunkpair = [previous_chunk, chunk]
                         c_count = chunkpairs.update_pairlist(chunkpair)
-                        previous_chunk = chunks.all[match]
+                        previous_chunk = matched_chunk
                     # reset chunk
                     chunk = Chunk()
 
@@ -534,21 +551,21 @@ def chunk_corpus(corpus):
                     # if btp indicates boundary
                     if btp <= average:
                         # check whether chunk is already in chunkatory
-                        for k in range(0, chunks.size):
-                            if chunks.all[k].ortho == chunk.ortho:
-                                chunks.all[k].count += 1
-                                chunkpair = [previous_chunk, chunk]
-                                c_count = chunkpairs.update_pairlist(chunkpair)
-                                previous_chunk = chunks.all[k]
-                                # reset chunk
-                                chunk = Chunk()
-                                stop = True
-                                break
+                        matched_chunk = chunks.lookup(chunk)
+                        if matched_chunk:
+                            matched_chunk.count += 1
+                            chunkpair = [previous_chunk, chunk]
+                            c_count = chunkpairs.update_pairlist(chunkpair)
+                            previous_chunk = matched_chunk
+                            # reset chunk
+                            chunk = Chunk()
+                            stop = True
+
                         # if chunk is new to the chunkatory
                         if not stop:
                             # add chunk
                             chunk.count = 1
-                            chunks.all.append(chunk)
+                            chunks.add_chunk(chunk)
 
                             # for production task
                             chunkpair = [previous_chunk, chunk]
@@ -566,10 +583,7 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
     utterances = allUtterances()
 
     # determine size of largest chunk in the corpus
-    maxlen_chunk = 0
-    for i in range(0, chunks.size):
-        if maxlen_chunk < len(chunks.all[i].ortho):
-            maxlen_chunk = len(chunks.all[i].ortho)
+    maxlen_chunk = chunks.max_chunk_length
 
     # loop through all child utterances one-by-one
     for i in range(0, NUM_UTTERANCES):
@@ -612,18 +626,16 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
                 u = u[1:]
                 n = min(maxlen_chunk, len(u))
 
-            # loop through all chunks to find a match with the utterance copy
-            for j in range(0, chunks.size):
-                # check for a (partial) match
-                if chunks.all[j].ortho == temp_u:
-                    # add chunk to bag of words and remove matching part from utterance
-                    chunk = chunks.all[j]
-                    bag_of_chunks.append(chunk)
-                    u = u[n:]
-                    stop = True
-                    # reset n
-                    n = min(maxlen_chunk, len(u))
-                    break
+            # check for a (partial) match
+            matched_chunk = chunks.lookup_by_key(temp_u)
+            if matched_chunk:
+                # add chunk to bag of words and remove matching part from utterance
+                chunk = matched_chunk
+                bag_of_chunks.append(chunk)
+                u = u[n:]
+                stop = True
+                # reset n
+                n = min(maxlen_chunk, len(u))
 
             # if no match of length n could be found, decrease n to search for
             # a smaller matching chunk
