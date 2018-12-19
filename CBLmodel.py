@@ -560,7 +560,7 @@ def chunk_corpus(corpus):
 
 ## utterance production task from McCauley (2011) paper ##
 # reconstructing child utterances from the corpus using the chunks and TPs discovered in the caregivers' utterances
-def production_task(child_corpus, chunks, chunkpairs):
+def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
 
     # initialization of variable to store all (reconstructed) utterances
     utterances = allUtterances()
@@ -573,11 +573,10 @@ def production_task(child_corpus, chunks, chunkpairs):
 
     # loop through all child utterances one-by-one
     for i in range(0, NUM_UTTERANCES):
-        # save child utterance in new variable
-
-        if i%1000 == 0:
+        if i % 1000 == 0:
             print("Currently processing utterance: "  + str(i))
 
+        # save child utterance in new variable
         utterance = child_corpus[i]
         ut = Utterance()
         ut.num = i
@@ -593,26 +592,25 @@ def production_task(child_corpus, chunks, chunkpairs):
         # making sure n (size of utterance matching chunk the algorithm searches for) isn't larger than the size of the utterance
         n = min(maxlen_chunk, len(utterance))
 
-        # until utterance is found completely, or the size of the matching chunk that is sought for is negative, search for chunks that match
-        # (part of) the child utterance
-        while not len(u) == 0 and not n <= 0:  #Comment AND-out for handling new words
+        # until utterance is found completely, or the size of the matching
+        # chunk that is sought for is zero, search for chunks that match
+        # (part of) the child utterance. If keep_all, then all utterances will
+        # be reconstructed, even if they contain unseen words (as in McCauley &
+        # Christiansen 2011).
+        while len(u) != 0 and (n > 0 or keep_all):
             # reset stop-criterion and make copy of (part of) utterance
             stop = False
             temp_u = u[0:n]
 
-            #when no chunk match is found, make new chunk with btp of 0.0 to everything
-            """
-            Comment this n==0 part out for running without handling new words"
-            """
-            """
-            if n == 0:
+            # when no chunk match is found, if keep_all, make new chunk with
+            # btp of 0.0 to everything
+            if n == 0 and keep_all:
                 new_chunk = Chunk()
                 new_chunk.ortho = [u[0]]
                 new_chunk.count = 0
                 bag_of_chunks.append(new_chunk)
                 u = u[1:]
                 n = min(maxlen_chunk, len(u))
-            """
 
             # loop through all chunks to find a match with the utterance copy
             for j in range(0, chunks.size):
@@ -626,23 +624,24 @@ def production_task(child_corpus, chunks, chunkpairs):
                     # reset n
                     n = min(maxlen_chunk, len(u))
                     break
-            # if no match of length n could be found, decrease n to search for a smaller matching chunk
-            if not stop:
-                if n != 0:
-                    n = n - 1
+
+            # if no match of length n could be found, decrease n to search for
+            # a smaller matching chunk
+            if not stop and n!= 0:
+                n = n - 1
 
         # store original utterance
         ut.ortho = utterance
 
-        ###Use this code if running without handling new words
-        #"""
-        if len(u) > 0:  # continue to next utterance if not all parts of utterances existed as chunks
+        # if throwing away utterances with unseen words, mark utterances with
+        # unaccounted-for words as skipped, and move on to the next utterance
+        if not keep_all and len(u) > 0:
             ut.skipped = True
             ut.bag_of_chunks = []
             utterances.all.append(ut)
             utterances.size += 1
             continue
-       # """
+
         # randomize order of chunks in bag_of_chunks
         shuffle(bag_of_chunks)
         ut.bag_of_chunks = deepcopy(bag_of_chunks)
@@ -782,6 +781,8 @@ def parse_arguments():
             help="'1_6', '2_0', '2_6', '3_0', '3_6', or '4_0'")
     p.add_argument('--max-utterances', metavar='N', type=int,
             help="train and test on up to N utterances")
+    p.add_argument('--keep-all', action='store_true',
+            help="keep utterances with previously-unseen words during test")
     return p.parse_args()
 
 if __name__ == "__main__":
@@ -823,7 +824,9 @@ if __name__ == "__main__":
             args.type +
             "_corpusProvidence_child" + args.child +
             "_age" + args.age +
-            "_productiontask.csv")
+            "_productiontask" +
+            ("_keep_all" if args.keep_all else "") +
+            ".csv")
 
     print('{} {} {}'.format(args.child, args.age, args.type))
 
@@ -852,7 +855,7 @@ if __name__ == "__main__":
 
     print("Reconstructing utterances...")
 
-    utterances = production_task(child_corpus, chunks, chunkpairs)
+    utterances = production_task(child_corpus, chunks, chunkpairs, args.keep_all)
 
     print("Utterance reconstruction complete")
 
