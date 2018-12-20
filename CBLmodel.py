@@ -1,4 +1,7 @@
+#!/usr/bin/env python2.7
+
 from __future__ import division
+import argparse
 import numpy as np
 import cPickle as pickle
 from random import shuffle
@@ -57,21 +60,38 @@ class WordList:
 class ChunkList:
     def __init__(self):
         self.size = 0 # An integer-value, how many chunks are stored in the list
-        self.all = [] # List of Chunk-objects
+        self.max_chunk_length = 0
+        self.all = {} # Dictionary of Chunk-objects
+
+    def add_chunk(self, chunk):
+        chunk_key = tuple(chunk.ortho)
+        self.all[chunk_key] = chunk
+        self.max_chunk_length = max(self.max_chunk_length, len(chunk.ortho))
+        self.size += 1
+
+    def lookup(self, chunk):
+        chunk_key = tuple(chunk.ortho)
+        return self.all.get(chunk_key)
+
+    def lookup_by_key(self, word_sequence):
+        chunk_key = tuple(word_sequence)
+        return self.all.get(chunk_key)
 
     # counts how often pair is (part of) an already stored chunk
-    def count_chunk(self, pair):
+    def count_pair(self, pair):
+        pair_key = tuple(pair)
         count = 0
         match = None
-        for k in range(0, self.size - 1):
+        for chunk_key, chunk in self.all.iteritems():
             # check for perfect match of pair with chunk
-            if self.all[k].ortho == pair:
-                match = k
-                count = count + self.all[k].count
+            if chunk_key == pair_key:
+                match = chunk
+                count += chunk.count
             # check if pair is subset of stored chunk
-            elif findsubset(self.all[k].ortho, pair):
-                count = count + self.all[k].count
-                # count: how often the pair is (part of) a chunk, match: the chunk that exactly matches pair
+            elif findsubset(chunk_key, pair_key):
+                count += chunk.count
+        # count: how often the pair is (part of) a chunk,
+        # match: the chunk (if any) that exactly matches pair
         return count, match
 
 "class Chunk: "
@@ -488,8 +508,7 @@ def chunk_corpus(corpus):
                 if btp <= average:
                     # add chunk to chunk-array
                     chunk.count = 1
-                    chunks.all.append(chunk)
-                    chunks.size += 1
+                    chunks.add_chunk(chunk)
                     chunkpair = [previous_chunk, chunk]
                     c_count = chunkpairs.update_pairlist(chunkpair)
                     previous_chunk = chunk
@@ -500,26 +519,27 @@ def chunk_corpus(corpus):
             # when chunkatory is not empty
             else:
                 # count how often pair (is part of) an already stored chunk
-                count, match = chunks.count_chunk(pair)
+                count, matched_chunk = chunks.count_pair(pair)
                 # if pair has been seen at least twice before as (part of) a chunk
+                # TODO: The comment above and the condition below disagree.
+                # Should the condition be count >= 2?
                 if count > 2:
                     # no perfect match in the dictionary, but count is high enough
-                    if match is None:
+                    if matched_chunk is None:
                         # add chunk to chunkatory, and frame to frame dictionary
                         chunk.ortho = pair
                         chunk.count = 1
-                        chunks.all.append(chunk)
-                        chunks.size += 1
+                        chunks.add_chunk(chunk)
                         chunkpair = [previous_chunk, chunk]
                         c_count = chunkpairs.update_pairlist(chunkpair)
                         previous_chunk = chunk
                     # if perfect match was found
                     else:
                         # up count of existing matching chunk
-                        chunks.all[match].count += 1
+                        matched_chunk.count += 1
                         chunkpair = [previous_chunk, chunk]
                         c_count = chunkpairs.update_pairlist(chunkpair)
-                        previous_chunk = chunks.all[match]
+                        previous_chunk = matched_chunk
                     # reset chunk
                     chunk = Chunk()
 
@@ -531,21 +551,21 @@ def chunk_corpus(corpus):
                     # if btp indicates boundary
                     if btp <= average:
                         # check whether chunk is already in chunkatory
-                        for k in range(0, chunks.size):
-                            if chunks.all[k].ortho == chunk.ortho:
-                                chunks.all[k].count += 1
-                                chunkpair = [previous_chunk, chunk]
-                                c_count = chunkpairs.update_pairlist(chunkpair)
-                                previous_chunk = chunks.all[k]
-                                # reset chunk
-                                chunk = Chunk()
-                                stop = True
-                                break
+                        matched_chunk = chunks.lookup(chunk)
+                        if matched_chunk:
+                            matched_chunk.count += 1
+                            chunkpair = [previous_chunk, chunk]
+                            c_count = chunkpairs.update_pairlist(chunkpair)
+                            previous_chunk = matched_chunk
+                            # reset chunk
+                            chunk = Chunk()
+                            stop = True
+
                         # if chunk is new to the chunkatory
                         if not stop:
                             # add chunk
                             chunk.count = 1
-                            chunks.all.append(chunk)
+                            chunks.add_chunk(chunk)
 
                             # for production task
                             chunkpair = [previous_chunk, chunk]
@@ -557,24 +577,20 @@ def chunk_corpus(corpus):
 
 ## utterance production task from McCauley (2011) paper ##
 # reconstructing child utterances from the corpus using the chunks and TPs discovered in the caregivers' utterances
-def production_task(child_corpus, chunks, chunkpairs):
+def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
 
     # initialization of variable to store all (reconstructed) utterances
     utterances = allUtterances()
 
     # determine size of largest chunk in the corpus
-    maxlen_chunk = 0
-    for i in range(0, chunks.size):
-        if maxlen_chunk < len(chunks.all[i].ortho):
-            maxlen_chunk = len(chunks.all[i].ortho)
+    maxlen_chunk = chunks.max_chunk_length
 
     # loop through all child utterances one-by-one
     for i in range(0, NUM_UTTERANCES):
-        # save child utterance in new variable
-
-        if i%1000 == 0:
+        if i % 1000 == 0:
             print("Currently processing utterance: "  + str(i))
 
+        # save child utterance in new variable
         utterance = child_corpus[i]
         ut = Utterance()
         ut.num = i
@@ -590,56 +606,54 @@ def production_task(child_corpus, chunks, chunkpairs):
         # making sure n (size of utterance matching chunk the algorithm searches for) isn't larger than the size of the utterance
         n = min(maxlen_chunk, len(utterance))
 
-        # until utterance is found completely, or the size of the matching chunk that is sought for is negative, search for chunks that match
-        # (part of) the child utterance
-        while not len(u) == 0 and not n <= 0:  #Comment AND-out for handling new words
+        # until utterance is found completely, or the size of the matching
+        # chunk that is sought for is zero, search for chunks that match
+        # (part of) the child utterance. If keep_all, then all utterances will
+        # be reconstructed, even if they contain unseen words (as in McCauley &
+        # Christiansen 2011).
+        while len(u) != 0 and (n > 0 or keep_all):
             # reset stop-criterion and make copy of (part of) utterance
             stop = False
             temp_u = u[0:n]
 
-            #when no chunk match is found, make new chunk with btp of 0.0 to everything
-            """
-            Comment this n==0 part out for running without handling new words"
-            """
-            """
-            if n == 0:
+            # when no chunk match is found, if keep_all, make new chunk with
+            # btp of 0.0 to everything
+            if n == 0 and keep_all:
                 new_chunk = Chunk()
                 new_chunk.ortho = [u[0]]
                 new_chunk.count = 0
                 bag_of_chunks.append(new_chunk)
                 u = u[1:]
                 n = min(maxlen_chunk, len(u))
-            """
 
-            # loop through all chunks to find a match with the utterance copy
-            for j in range(0, chunks.size):
-                # check for a (partial) match
-                if chunks.all[j].ortho == temp_u:
-                    # add chunk to bag of words and remove matching part from utterance
-                    chunk = chunks.all[j]
-                    bag_of_chunks.append(chunk)
-                    u = u[n:]
-                    stop = True
-                    # reset n
-                    n = min(maxlen_chunk, len(u))
-                    break
-            # if no match of length n could be found, decrease n to search for a smaller matching chunk
-            if not stop:
-                if n != 0:
-                    n = n - 1
+            # check for a (partial) match
+            matched_chunk = chunks.lookup_by_key(temp_u)
+            if matched_chunk:
+                # add chunk to bag of words and remove matching part from utterance
+                chunk = matched_chunk
+                bag_of_chunks.append(chunk)
+                u = u[n:]
+                stop = True
+                # reset n
+                n = min(maxlen_chunk, len(u))
+
+            # if no match of length n could be found, decrease n to search for
+            # a smaller matching chunk
+            if not stop and n!= 0:
+                n = n - 1
 
         # store original utterance
         ut.ortho = utterance
 
-        ###Use this code if running without handling new words
-        #"""
-        if len(u) > 0:  # continue to next utterance if not all parts of utterances existed as chunks
+        # if throwing away utterances with unseen words, mark utterances with
+        # unaccounted-for words as skipped, and move on to the next utterance
+        if not keep_all and len(u) > 0:
             ut.skipped = True
             ut.bag_of_chunks = []
             utterances.all.append(ut)
             utterances.size += 1
             continue
-       # """
+
         # randomize order of chunks in bag_of_chunks
         shuffle(bag_of_chunks)
         ut.bag_of_chunks = deepcopy(bag_of_chunks)
@@ -712,12 +726,9 @@ def determine_pc(chunkpair, chunkpairs):
     return 0
 
 # evaluates the reconstructed utterances and saves results in .csv file
-def evaluate_and_save(utterances):
+def evaluate_and_save(utterances, child, age, output_filename):
     # create outputfile with file header
-    outputfilename = child_file.replace('.txt', '_productiontask.csv')
-    outputfilename = outputfilename.replace('Data', 'results/noskipping')
-
-    with open(outputfilename, "w") as output:
+    with open(output_filename, "w") as output:
         writer = csv.writer(output, delimiter=";")
         header = ["num", "utterance", "child", "age", "skipped", "reconstructed", "bow", "gold", "prediction","chance","controlledscore"]
         writer.writerow(header)
@@ -763,55 +774,103 @@ def evaluate_and_save(utterances):
                 controlledscore = 'NaN'
 
             # write utterance data to output file
-            row = [str(num), str(utterance), str(CHILD), str(AGE), str(skip), str(reconstructed), str(bow), str(gold),
+            row = [str(num), str(utterance), child, age, str(skip), str(reconstructed), str(bow), str(gold),
                    str(prediction),str(chance),str(controlledscore)]
             writer.writerow(row)
-    print("Output written to file")
+    print("Wrote output to: {}".format(os.path.relpath(output_filename)))
     return
 
+def parse_arguments():
+    p = argparse.ArgumentParser(description="Run the model")
+    p.add_argument('--type', metavar='T', required=True,
+            choices=['c', 'l'],
+            help="'c' (cumulative) or 'l' (local)")
+    p.add_argument('--child', metavar='C', required=True,
+            choices=['Alex', 'Ethan', 'Lily', 'Naima', 'Violet', 'William'],
+            help="'Alex', 'Ethan', 'Lily', 'Naima', 'Violet', or 'William'")
+    p.add_argument('--age', metavar='A', required=True,
+            choices=['1_6', '2_0', '2_6', '3_0', '3_6', '4_0'],
+            help="'1_6', '2_0', '2_6', '3_0', '3_6', or '4_0'")
+    p.add_argument('--max-utterances', metavar='N', type=int,
+            help="train and test on up to N utterances")
+    p.add_argument('--keep-all', action='store_true',
+            help="keep utterances with previously-unseen words during test")
+    return p.parse_args()
+
 if __name__ == "__main__":
-    #change path of location of corpusfiles
-    path = os.path.abspath('')
-    path = path.replace('/Model/Scripts','')
-    path = os.path.join(path, 'Data')
+    args = parse_arguments()
 
-    ##A DJUST THESE TO SELECT CORPUS DATA ###
-    TYPE = "a" # or "l"
-    CHILD = "Alex" # Choose between Alex, Ethan, Lily, Naima, Violet and William for Providence corpus, or ArtLg for Artificial Grammar
-    AGE = "2_6" #  Choose between 1_6, 2_0, 2_6, 3_0, 3_ or 4_0 for Providence corpus or NVT for Artificial Grammar
-    if TYPE == "a":
-        LOC = os.path.join(path, 'accumulativesampledcorpus')
-    elif TYPE == "l":
-        LOC = os.path.join(path, 'localsampledcorpus')
+    cwd = os.getcwd()
+    if args.type == "c":
+        LOC = os.path.join(cwd, 'cumulativesampledcorpus')
+    elif args.type == "l":
+        LOC = os.path.join(cwd, 'localsampledcorpus')
     else:
-        LOC = os.path.join(path, 'ArtCorpus')
+        raise ValueError('Unexpected type: {}'.format(args.type))
 
-    caregiver_filename =  LOC + "/" + TYPE + "_corpusProvidence_caregivers_" + CHILD + "_age" + AGE + ".txt" #"ArtLgCorpus.txt"
-    caregiver_size_filename =  LOC + "/" + TYPE + "_corpusProvidence_caregivers_size" + CHILD + "_age" + AGE + ".txt"  #"ArtLgCorpus_size.txt"
+    caregiver_filename =  os.path.join(LOC,
+            args.type +
+            "_corpusProvidence_caregivers_" + args.child +
+            "_age" + args.age +
+            ".txt")
 
-    child_file = LOC +  "/" + TYPE + "_corpusProvidence_child" + CHILD + "_age" + AGE + ".txt"  # or: "ArtLgcorpus_child.txt"
-    child_size_file = LOC + "/" + TYPE + "_corpusProvidence_child_size" + CHILD + "_age" + AGE + ".txt"  # or: "ArtLgcorpus_child_size.txt"
+    caregiver_size_filename = os.path.join(LOC,
+            args.type +
+            "_corpusProvidence_caregivers_size" + args.child +
+            "_age" + args.age +
+            ".txt")
 
-    print ('Start' + CHILD + AGE + TYPE)
+    child_filename = os.path.join(LOC,
+            args.type +
+            "_corpusProvidence_child" + args.child +
+            "_age" + args.age +
+            ".txt")
 
-    corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(caregiver_filename, caregiver_size_filename)
+    child_size_filename = os.path.join(LOC,
+            args.type +
+            "_corpusProvidence_child_size" + args.child +
+            "_age" + args.age +
+            ".txt")
+
+    output_filename = os.path.join(os.getcwd(), 'results',
+            args.type +
+            "_corpusProvidence_child" + args.child +
+            "_age" + args.age +
+            "_productiontask" +
+            ("_keep_all" if args.keep_all else "") +
+            ".csv")
+
+    print('{} {} {}'.format(args.child, args.age, args.type))
+
+    corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(
+            caregiver_filename, caregiver_size_filename)
+
     NUM_PAIRS = 2 * NUM_WORDS
     NUM_CHUNKS = NUM_PAIRS
     NUM_FRAMES = NUM_PAIRS
 
-    #NUM_UTTERANCES = min(200, NUM_UTTERANCES)  # for testing code with subset of data
-    print NUM_UTTERANCES
+    if (args.max_utterances):
+        NUM_UTTERANCES = min(args.max_utterances, NUM_UTTERANCES)
 
-    print("\nFile read")
+    print("NUM_UTTERANCES = {}".format(NUM_UTTERANCES))
+
+    print("Chunking...")
     chunks, chunkpairs, all = chunk_corpus(corpus)
-    print("\nChunking complete")
 
-    child_corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(child_file, child_size_file)
-    #NUM_UTTERANCES = min(200, NUM_UTTERANCES)  # for testing code with subset of data
+    child_corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(
+            child_filename, child_size_filename)
 
-    print("\nChild file read")
-    print NUM_UTTERANCES
-    utterances = production_task(child_corpus, chunks, chunkpairs)
-    print("\nProduction task completed")
-    evaluate_and_save(utterances)
+    if (args.max_utterances):
+        NUM_UTTERANCES = min(args.max_utterances, NUM_UTTERANCES)
+
+    print("NUM_UTTERANCES = {}".format(NUM_UTTERANCES))
+
+    print("Reconstructing utterances...")
+
+    utterances = production_task(child_corpus, chunks, chunkpairs, args.keep_all)
+
+    print("Utterance reconstruction complete")
+
+    evaluate_and_save(utterances, args.child, args.age, output_filename)
+
     print("Program done")
