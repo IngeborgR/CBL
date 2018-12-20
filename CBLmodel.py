@@ -471,7 +471,7 @@ def chunk_corpus(corpus):
     # loop through all utterances in the corpus one-by-one
     for i in range(0, NUM_UTTERANCES):
 
-        if i%100 == 0:
+        if i%1000 == 0:
             print("currently processing utterance: "  + str(i))
 
         utterance = corpus[i]
@@ -585,7 +585,7 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
 
     # loop through all child utterances one-by-one
     for i in range(0, NUM_UTTERANCES):
-        if i % 100 == 0:
+        if i % 1000 == 0:
             print("Currently processing utterance: "  + str(i))
 
         # save child utterance in new variable
@@ -792,8 +792,8 @@ def parse_arguments():
             choices=['Alex', 'Ethan', 'Lily', 'Naima', 'Violet', 'William'],
             help="'Alex', 'Ethan', 'Lily', 'Naima', 'Violet', or 'William'")
     p.add_argument('--age', metavar='A', required=True,
-            choices=['1_6', '2_0', '2_6', '3_0', '3_6', '4_0'],
-            help="'1_6', '2_0', '2_6', '3_0', '3_6', or '4_0'")
+            choices=['1_0','1_6', '2_0', '2_6', '3_0', '3_6', '4_0'],
+            help="'1_0','1_6', '2_0', '2_6', '3_0', '3_6', or '4_0'")
     p.add_argument('--max-utterances', metavar='N', type=int,
             help="train and test on up to N utterances")
     p.add_argument('--keep-all', action='store_true',
