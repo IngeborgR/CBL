@@ -24,7 +24,7 @@ class Word:
 "class Wordlist: "
 class WordList:
     def __init__(self):
-        self.size = 0 #A n integer-value, how many words are stored in the list
+        self.size = 0 # An integer-value, how many words are stored in the list
         self.all = [] # List of Word-objects
 
     # adds a Word to WordList, and updates WordList values
@@ -44,7 +44,7 @@ class WordList:
 
     # returns the wordcount for the word
     def getWordcount(self, word):
-        for k in range(0, self, size):
+        for k in range(0, self, size):  ##COMMENT: Shouldn't this be: self.size? This is probably not used!
             if self.all[k].ortho == word:
                 return self.all[k].count
         return 0
@@ -60,7 +60,7 @@ class WordList:
 class ChunkList:
     def __init__(self):
         self.size = 0 # An integer-value, how many chunks are stored in the list
-        self.max_chunk_length = 0
+        self.max_chunk_length = 0 # The size of the largest chunk
         self.all = {} # Dictionary of Chunk-objects
 
     def add_chunk(self, chunk):
@@ -97,13 +97,13 @@ class ChunkList:
 "class Chunk: "
 class Chunk:
     def __init__(self):
-        self.ortho = [] # String, orthographic representating of the chunk
+        self.ortho = [] # List of strings, orthographic representating of the chunk
         self.count = 0 # An integer-value, how often the chunk has been seen
 
 # returns a printable string version of the chunk
 def show(chunk):
     return (str(chunk.ortho) + "\t counted: " + str(chunk.count) + " times")
-
+"""
 "class FrameList: "
 class FrameList:
     def __init__(self):
@@ -301,7 +301,7 @@ def show(frame):
     for k in range(0, len(frame.after_slot)):
         string += str(frame.after_slot[k].ortho) + str(frame.after_probs[k]) + "\t"
     return string
-
+"""
 "class Wordpair: "
 class Wordpair:
     def __init__(self, pair, count):
@@ -330,7 +330,7 @@ class PairList:
         # list of pairs, number of pairs, count of new pair
         return wordpair.count
 
-"class PairList: "
+"class ChunkPairList: "
 class ChunkPairList:
     def __init__(self):
         self.all = [] # List, containing ChunkPair-objects
@@ -346,8 +346,8 @@ class ChunkPairList:
         temp_pair += str(pair[1].ortho)
 
         for k in range(0, self.size):
-            # if the word-pair is already in the list, adjust the associated word-pair count
             temp = ''
+            # if the word-pair is already in the list, adjust the associated word-pair count
             if isinstance(self.all[k].ortho[0], Chunk):
                 temp += str(self.all[k].ortho[0].ortho)
             else:
@@ -471,7 +471,7 @@ def chunk_corpus(corpus):
     # loop through all utterances in the corpus one-by-one
     for i in range(0, NUM_UTTERANCES):
 
-        if i%1000 == 0:
+        if i%100 == 0:
             print("currently processing utterance: "  + str(i))
 
         utterance = corpus[i]
@@ -521,9 +521,7 @@ def chunk_corpus(corpus):
                 # count how often pair (is part of) an already stored chunk
                 count, matched_chunk = chunks.count_pair(pair)
                 # if pair has been seen at least twice before as (part of) a chunk
-                # TODO: The comment above and the condition below disagree.
-                # Should the condition be count >= 2?
-                if count > 2:
+                if count >= 2:
                     # no perfect match in the dictionary, but count is high enough
                     if matched_chunk is None:
                         # add chunk to chunkatory, and frame to frame dictionary
@@ -587,7 +585,7 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
 
     # loop through all child utterances one-by-one
     for i in range(0, NUM_UTTERANCES):
-        if i % 1000 == 0:
+        if i % 100 == 0:
             print("Currently processing utterance: "  + str(i))
 
         # save child utterance in new variable
@@ -599,7 +597,12 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
         # adjust child utterance formatting
         u = []
 
-        for j in range(0, len(utterance)):
+
+        # NOTE: starting from "1" means removing "#" marker from child utterances,
+        # Otherwise, the "#" can get parsed as part of one the chunks, which in turn
+        # causes problems when trying to find the first chunk with the highest BTP
+        # wrt to the beginning of the utterance
+        for j in range(1, len(utterance)):
             u.append(utterance[j].ortho)
         copy_u = deepcopy(u)
 
@@ -642,8 +645,8 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
             if not stop and n!= 0:
                 n = n - 1
 
-        # store original utterance
-        ut.ortho = utterance
+        # store original utterance, without the #-marker
+        ut.ortho = utterance[1:]
 
         # if throwing away utterances with unseen words, mark utterances with
         # unaccounted-for words as skipped, and move on to the next utterance
