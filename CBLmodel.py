@@ -336,25 +336,38 @@ class ChunkPairList:
         self.all = [] # List, containing ChunkPair-objects
         self.size = 0 # An integer-value, how many ChunkPairs are stored in the ChunkList
 
+    ##TODO: check if this fix works
     # updates chunkpair list,  by adding pair if it is new, or increasing the count of an already stored ChunkPair
     def update_pairlist(self, pair):
-        temp_pair = ""
+        temp_pair_0 = ""
+        temp_pair_1 = ""
         if isinstance(pair[0], Chunk):
-            temp_pair += str(pair[0].ortho)
+            temp_pair_0 += str(pair[0].ortho)
         else:
-            temp_pair += str(pair[0])
-        temp_pair += str(pair[1].ortho)
+            temp_pair_0 += str(pair[0])
+        temp_pair_1 += str(pair[1].ortho)
+
+        #for testing purposes
+        print pair
+        print temp_pair_0
+        print temp_pair_1
 
         for k in range(0, self.size):
-            temp = ''
+            temp_0 = ""
+            temp_1 = ""
             # if the word-pair is already in the list, adjust the associated word-pair count
             if isinstance(self.all[k].ortho[0], Chunk):
-                temp += str(self.all[k].ortho[0].ortho)
+                temp_0 += str(self.all[k].ortho[0].ortho)
             else:
-                temp += self.all[k].ortho[0]
-            temp += str(self.all[k].ortho[1].ortho)
-            if temp == temp_pair:
-                # print 'match found'
+                temp_0 += self.all[k].ortho[0]
+            temp_1 += str(self.all[k].ortho[1].ortho)
+            # for testing purposes
+            print self.all[k]
+            print temp_0
+            print temp_1
+            if (temp_0 == temp_pair_0) && (temp_1 == temp_pair_1):
+                # for testing purposes
+                print 'match found'
                 self.all[k].count += 1
                 # list of pairs, number of pairs, count of added pair
                 return self.all[k].count
@@ -712,6 +725,9 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
     return utterances
 
 # returns how often the chunkpair has been seen
+##TODO: Fix this function: do separate comparison on chunkpair[0] vs chunkpairs.all[i].ortho[0] and
+##TODO: chunkpair[1] and chunkpairs.all[i].ortho[1]. Perhaps also need to adjust how this chunkpair is formed
+##TODO: in def production_task
 def determine_pc(chunkpair, chunkpairs):
     for i in range(0, chunkpairs.size):
         temp = []
