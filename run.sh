@@ -14,6 +14,13 @@ main() {
     for type in $types; do
       for child in $children; do
         for age in $ages; do
+          # Make sure that the child-age combination exists.
+          local file_substr="${type}*${child}_age${age}*"
+          local file=$(find . -name "$file_substr" | head -n 1)
+          if [ -z "$file" ]; then
+            continue
+          fi
+
           if [ $keep_all_variant == '1' ]; then
             ./CBLmodel.py --type=$type --child=$child --age=$age --keep-all
           else
