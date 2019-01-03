@@ -103,205 +103,7 @@ class Chunk:
 # returns a printable string version of the chunk
 def show(chunk):
     return (str(chunk.ortho) + "\t counted: " + str(chunk.count) + " times")
-"""
-"class FrameList: "
-class FrameList:
-    def __init__(self):
-        self.numframes = 0 # An integer-value, how many frames are stored in the list
-        self.all = []  # List of Frame-objects
 
-    # adds a new frame to the FrameList
-    def add_frame(self, chunk, utterance, previous_frame):
-        # initialization of variables
-        before = False
-        after = False
-        found = False
-        start = None
-        end = None
-
-        # make temporary copy of utterance and frame as lists for practical purposes
-        temp_u = []
-        temp_chunk = []
-        for k in range(0, len(utterance)):
-            temp_u.append(utterance[k].ortho)
-        for k in range(0, len(chunk.ortho)):
-            temp_chunk.append(chunk.ortho[k])
-
-        # search for frame within utterance and determine if it is preceded and/or
-        # followed by a word(s)
-        for subtuple_length in reversed(xrange(1, len(temp_u))):
-            for start_index in xrange(0, (len(temp_u) + 1 - subtuple_length)):
-                temp = temp_u[start_index:start_index + subtuple_length]
-                if temp == temp_chunk:
-                    found = True
-                    start = start_index
-                    end = start_index + subtuple_length
-                    break
-        if found:
-            if start > 1:
-                before = True
-            if end < len(utterance) - 1:
-                after = True
-
-        # make a new frame object and add it to the list of frames
-        new_frame = Frame(chunk)
-        ortho = (" ".join(chunk.ortho))
-        new_frame.ortho = ortho
-
-        if previous_frame:
-            p = self.all[previous_frame]
-            new_frame.before_slot.append(p)
-            new_frame.before_probs.append(1)
-        elif before:
-            new_frame.before_slot.append(utterance[start - 1])
-            new_frame.before_probs.append(1)
-        if after:
-            new_frame.after_slot.append(utterance[end])
-            new_frame.after_probs.append(1)
-
-        self.all.append(new_frame)
-        self.numframes += 1
-        stop = False
-
-        if previous_frame:
-            for k in range(0, len(self.all[previous_frame].after_slot)):
-                if self.all[previous_frame].after_slot[k].ortho == new_frame.ortho:
-                    self.all[previous_frame].after_probs[k] += 1
-                    stop = True
-                    break
-            if not stop:
-                self.all[previous_frame].after_slot.append(new_frame)
-                self.all[previous_frame].after_probs.append(1)
-
-    # updates existing frames by adding orthographic information to the before and after slots when encountered
-    def update_frame(self, frame, utterance, previous_frame):
-        # initialization
-        before = False
-        after = False
-        found = False
-        start = None
-        end = None
-        temp_u = []
-        temp_chunk = []
-
-        # make temporary copy of utterance and frame as lists for practical purposes
-        for k in range(0, len(utterance)):
-            temp_u.append(utterance[k].ortho)
-        for k in range(0, len(self.all[frame].chunk.ortho)):
-            temp_chunk.append(self.all[frame].chunk.ortho[k])
-
-        # search for frame within utterance and determine if it is preceded and/or
-        # followed by a word(s)
-        for subtuple_length in reversed(xrange(1, len(temp_u))):
-            for start_index in xrange(0, (len(temp_u) + 1 - subtuple_length)):
-                temp = temp_u[start_index:start_index + subtuple_length]
-                if temp == temp_chunk:
-                    found = True
-                    start = start_index
-                    end = start_index + subtuple_length
-                    break
-        if found:
-            if start > 1:
-                before = True
-            if end < len(utterance) - 1:
-                after = True
-
-        # add ortho to frame in the correct slot
-        stop = False
-
-        if previous_frame:
-            for k in range(0, len(self.all[frame].before_slot)):
-                # print self.all[frame].before_slot[k].ortho
-                if self.all[frame].before_slot[k].ortho == self.all[previous_frame].ortho:
-                    self.all[frame].before_probs[k] += 1
-                    stop = True
-                    break
-            if not stop:
-                self.all[frame].before_slot.append(self.all[previous_frame])
-                self.all[frame].before_probs.append(1)
-            stop = False
-            for k in range(0, len(self.all[previous_frame].after_slot)):
-                if self.all[previous_frame].after_slot[k].ortho == self.all[frame].ortho:
-                    self.all[previous_frame].after_probs[k] += 1
-                    stop = True
-                    break
-            if not stop:
-                self.all[previous_frame].after_slot.append(self.all[frame])
-                self.all[previous_frame].after_probs.append(1)
-        elif before:
-            for k in range(0, len(self.all[frame].before_slot)):
-                # if the ortho is already in this slot, adjust the word count
-                if self.all[frame].before_slot[k].ortho == utterance[start - 1].ortho:
-                    self.all[frame].before_probs[k] += 1
-                    stop = True
-                    break
-            # if the word is new to this slot, add the word
-            if not stop:
-                self.all[frame].before_slot.append(utterance[start - 1])
-                self.all[frame].before_probs.append(1)
-
-        stop = False
-        if after:
-            for k in range(0, len(self.all[frame].after_slot)):
-                # if the ortho is already in this slot, adjust the word count
-                if self.all[frame].after_slot[k].ortho == utterance[end].ortho:
-                    self.all[frame].after_probs[k] += 1
-                    stop = True
-                    break
-            if not stop:  # if the word is new to this slot, add the word
-                self.all[frame].after_slot.append(utterance[end])
-                self.all[frame].after_probs.append(1)
-
-    # searches whether a chunk is already a frame stored in self.all
-    def find_frame(self, chunk):
-        for l in range(self.numframes):
-            if self.all[l].chunk.ortho == chunk.ortho:
-                # l: index of matching frame in frames
-                return l
-        # no match is found, None: no index of matching frame in f
-        return None
-
-    # TODO: UNFINISHED CODE, NOT SURE WHAT THIS WAS SUPPOSED TO DO
-    def findWordClass(self, all):
-        for i in range(0, self.numframes):
-            # for each frame, mark the ortho that occur in the same frame (or something like that)
-            for j in range(0, len(self.all[i].before_slot)):
-                word = self.all[i].before_slot[j]
-                w = all.findWord(word)
-            # update word.framecount oid
-
-            for j in range(0, len(self.all[i].after_slot)):
-                word = self.all[i].after_slot[j]
-                w = all.findWord(word)
-        return all
-
-
-"class Frame: "
-class Frame:
-    def __init__(self, chunk):
-        self.chunk = chunk  # A list of word objects, empty slots represented by 'X# '
-        self.ortho = None #String-value, orthographic representation of chunk
-        self.before_slot = [] #A list, containing the Words / Chunks seen before the chunk
-        self.before_probs = [] #A list, containing the counts of Words / Chunks seen before the chunk
-        self.after_slot = [] #A list, containing the Words / Chunks seen after the chunk
-        self.after_probs = [] #A list, containing the counts of Words / Chunks seen after the chunk
-
-
-# returns printable string to check frame contents
-def show(frame):
-    string = ""
-    if len(frame.before_slot) > 0:
-        string += "X "
-    for k in range(0, len(frame.before_slot)):
-        string += str(frame.before_slot[k].ortho) + str(frame.before_probs[k]) + "\t"
-    string += str(frame.ortho)
-    if len(frame.after_slot) > 0:
-        string += " X"
-    string += "\t counted: " + str(frame.chunk.count) + " times" + "\t"
-    for k in range(0, len(frame.after_slot)):
-        string += str(frame.after_slot[k].ortho) + str(frame.after_probs[k]) + "\t"
-    return string
-"""
 "class Wordpair: "
 class Wordpair:
     def __init__(self, pair, count):
@@ -336,7 +138,6 @@ class ChunkPairList:
         self.all = [] # List, containing ChunkPair-objects
         self.size = 0 # An integer-value, how many ChunkPairs are stored in the ChunkList
 
-    ##TODO: check if this fix works
     # updates chunkpair list,  by adding pair if it is new, or increasing the count of an already stored ChunkPair
     def update_pairlist(self, pair):
         temp_pair_0 = ""
@@ -347,11 +148,6 @@ class ChunkPairList:
             temp_pair_0 += str(pair[0])
         temp_pair_1 += str(pair[1].ortho)
 
-        #for testing purposes
-        print pair
-        print temp_pair_0
-        print temp_pair_1
-
         for k in range(0, self.size):
             temp_0 = ""
             temp_1 = ""
@@ -361,13 +157,7 @@ class ChunkPairList:
             else:
                 temp_0 += self.all[k].ortho[0]
             temp_1 += str(self.all[k].ortho[1].ortho)
-            # for testing purposes
-            print self.all[k]
-            print temp_0
-            print temp_1
-            if (temp_0 == temp_pair_0) && (temp_1 == temp_pair_1):
-                # for testing purposes
-                print 'match found'
+            if (temp_0 == temp_pair_0) and (temp_1 == temp_pair_1):
                 self.all[k].count += 1
                 # list of pairs, number of pairs, count of added pair
                 return self.all[k].count
@@ -694,7 +484,8 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
                         pair = current.ortho
                 else:
                     pair = previous + current.ortho
-
+                print"pair"
+                print pair
                 # determine how often the pair of chunks has been seen in corpus
                 current_count = current.count
                 if current_count == 0:
@@ -729,8 +520,11 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
 ##TODO: chunkpair[1] and chunkpairs.all[i].ortho[1]. Perhaps also need to adjust how this chunkpair is formed
 ##TODO: in def production_task
 def determine_pc(chunkpair, chunkpairs):
+    print "chunkpair"
+    print chunkpair
     for i in range(0, chunkpairs.size):
         temp = []
+        #temp_1 = []
         # convert representation
         if isinstance(chunkpairs.all[i].ortho[0], Chunk):
             temp += chunkpairs.all[i].ortho[0].ortho
@@ -740,7 +534,12 @@ def determine_pc(chunkpair, chunkpairs):
             temp += chunkpairs.all[i].ortho[1].ortho
         else:
             temp += chunkpairs.all[i].ortho[1]
-        if chunkpair == temp:
+
+        if chunkpair == temp:# and chunkpair[1] == temp_1:
+            print "match found"
+            print chunkpair
+            print temp
+            print"----"
             return chunkpairs.all[i].count
     return 0
 
@@ -816,6 +615,7 @@ def parse_arguments():
             help="keep utterances with previously-unseen words during test")
     return p.parse_args()
 
+"""
 if __name__ == "__main__":
     args = parse_arguments()
 
@@ -893,3 +693,49 @@ if __name__ == "__main__":
     evaluate_and_save(utterances, args.child, args.age, output_filename)
 
     print("Program done")
+"""
+
+if __name__ == "__main__":
+    #change path of location of corpusfiles
+    path = os.path.abspath('')
+    #path = path.replace('/Model/Scripts','')
+    #path = os.path.join(path, 'Data')
+
+    ##A DJUST THESE TO SELECT CORPUS DATA ###
+    TYPE = "l" # c or "l"
+    CHILD = "Alex" # Choose between Alex, Ethan, Lily, Naima, Violet and William for Providence corpus, or ArtLg for Artificial Grammar
+    AGE = "2_6" #  Choose between 1_6, 2_0, 2_6, 3_0, 3_ or 4_0 for Providence corpus or NVT for Artificial Grammar
+    if TYPE == "c":
+        LOC = os.path.join(path, 'cumulativesampledcorpus')
+    else:
+        LOC = os.path.join(path, 'localsampledcorpus')
+
+    caregiver_filename =  LOC + "/" + TYPE + "_corpusProvidence_caregivers_" + CHILD + "_age" + AGE + ".txt" #"ArtLgCorpus.txt"
+    caregiver_size_filename =  LOC + "/" + TYPE + "_corpusProvidence_caregivers_size" + CHILD + "_age" + AGE + ".txt"  #"ArtLgCorpus_size.txt"
+
+    child_file = LOC +  "/" + TYPE + "_corpusProvidence_child" + CHILD + "_age" + AGE + ".txt"  # or: "ArtLgcorpus_child.txt"
+    child_size_file = LOC + "/" + TYPE + "_corpusProvidence_child_size" + CHILD + "_age" + AGE + ".txt"  # or: "ArtLgcorpus_child_size.txt"
+
+    print ('Start' + CHILD + AGE + TYPE)
+
+    corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(caregiver_filename, caregiver_size_filename)
+    NUM_PAIRS = 2 * NUM_WORDS
+    NUM_CHUNKS = NUM_PAIRS
+    NUM_FRAMES = NUM_PAIRS
+
+    #NUM_UTTERANCES = min(5000, NUM_UTTERANCES)  # for testing code with subset of data
+    print NUM_UTTERANCES
+
+    print("\nFile read")
+    chunks, chunkpairs, all = chunk_corpus(corpus)
+    print("\nChunking complete")
+
+    child_corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(child_file, child_size_file)
+    NUM_UTTERANCES = min(1000, NUM_UTTERANCES)  # for testing code with subset of data
+
+    print("\nChild file read")
+    print NUM_UTTERANCES
+    utterances = production_task(child_corpus, chunks, chunkpairs)
+    print("\nProduction task completed")
+    #evaluate_and_save(utterances)
+    #print("Program done")
