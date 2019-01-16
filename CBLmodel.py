@@ -561,7 +561,6 @@ def evaluate_and_save(utterances, child, age, output_filename):
                     utterances.all[i].reconstructed = False
                 gold = true_temp
                 prediction = reconstructed_temp
-               # bow = utterances.all[i].bag_of_chunks
                 reconstructed = utterances.all[i].reconstructed
                 n_chunks = len(utterances.all[i].bag_of_chunks)
                 chance = 1/(np.math.factorial(n_chunks))
@@ -573,7 +572,7 @@ def evaluate_and_save(utterances, child, age, output_filename):
             else:
             	for j in range(0, len(utterance)):
                     true_temp += str(utterance[j].ortho)
-                gold = true_temp  #CHANGE THIS ONE
+                gold = true_temp 
                 prediction = 'NaN'
                 bow = 'NaN' 
                 reconstructed = 'NaN'
@@ -681,50 +680,3 @@ if __name__ == "__main__":
     evaluate_and_save(utterances, args.child, args.age, output_filename)
 
     print("Program done")
-
-"""
-if __name__ == "__main__":
-    #change path of location of corpusfiles
-    path = os.path.abspath('')
-    #path = path.replace('/Model/Scripts','')
-    #path = os.path.join(path, 'Data')
-
-    ##A DJUST THESE TO SELECT CORPUS DATA ###
-    TYPE = "c" # c or "l"
-    CHILD = "Alex" # Choose between Alex, Ethan, Lily, Naima, Violet and William for Providence corpus, or ArtLg for Artificial Grammar
-    AGE = "3_6" #  Choose between 1_6, 2_0, 2_6, 3_0, 3_ or 4_0 for Providence corpus or NVT for Artificial Grammar
-    if TYPE == "c":
-        LOC = os.path.join(path, 'cumulativesampledcorpus')
-    else:
-        LOC = os.path.join(path, 'localsampledcorpus')
-
-    caregiver_filename =  LOC + "/" + TYPE + "_corpusProvidence_caregivers_" + CHILD + "_age" + AGE + ".txt" #"ArtLgCorpus.txt"
-    caregiver_size_filename =  LOC + "/" + TYPE + "_corpusProvidence_caregivers_size" + CHILD + "_age" + AGE + ".txt"  #"ArtLgCorpus_size.txt"
-
-    child_file = LOC +  "/" + TYPE + "_corpusProvidence_child" + CHILD + "_age" + AGE + ".txt"  # or: "ArtLgcorpus_child.txt"
-    child_size_file = LOC + "/" + TYPE + "_corpusProvidence_child_size" + CHILD + "_age" + AGE + ".txt"  # or: "ArtLgcorpus_child_size.txt"
-
-    print ('Start' + CHILD + AGE + TYPE)
-
-    corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(caregiver_filename, caregiver_size_filename)
-    NUM_PAIRS = 2 * NUM_WORDS
-    NUM_CHUNKS = NUM_PAIRS
-    NUM_FRAMES = NUM_PAIRS
-
-    NUM_UTTERANCES = min(2000, NUM_UTTERANCES)  # for testing code with subset of data
-    print NUM_UTTERANCES
-
-    print("\nFile read")
-    chunks, chunkpairs, all = chunk_corpus(corpus)
-    print("\nChunking complete")
-
-    child_corpus, NUM_UTTERANCES, NUM_WORDS, PHRASE_MEASURES = fileread(child_file, child_size_file)
-    NUM_UTTERANCES = min(1000, NUM_UTTERANCES)  # for testing code with subset of data
-
-    print("\nChild file read")
-    print NUM_UTTERANCES
-    utterances = production_task(child_corpus, chunks, chunkpairs)
-    print("\nProduction task completed")
-    #evaluate_and_save(utterances)
-    #print("Program done")
-"""
