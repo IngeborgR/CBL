@@ -570,6 +570,7 @@ def evaluate_and_save(utterances, child, age, output_filename):
                     controlledscore = np.math.log(1 - (1/np.math.factorial(n_chunks)))
             # if utterance was skipped, set all irrelevant variables to NaN
             else:
+                true_temp = ""
             	for j in range(0, len(utterance)):
                     true_temp += str(utterance[j].ortho)
                 gold = true_temp 
