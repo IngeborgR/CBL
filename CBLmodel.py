@@ -478,14 +478,9 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
                 # determine pair of previous selected chunk + current chunk c
                 pair = []
                 if first:
-                    if not '#' in current.ortho:
-                        pair = ['#'] + current.ortho  # pair = [previously chosen chunk / '#', c]\
-                    else:
-                        pair = current.ortho
+                    pair = [['#'],current.ortho]
                 else:
-                    pair = previous + current.ortho
-                print"pair"
-                print pair
+                    pair = [previous,current.ortho]
                 # determine how often the pair of chunks has been seen in corpus
                 current_count = current.count
                 if current_count == 0:
@@ -506,7 +501,7 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
             # save the selected chunk in the reconstruction, remove it from bag of chunks and update previous chunk
             reconstructed_utterance.append(selected_chunk)
             bag_of_chunks.remove(selected_chunk)
-            previous = [selected_chunk.ortho]
+            previous = selected_chunk.ortho
             first = False
 
         # store reconstructed utterance
@@ -516,30 +511,20 @@ def production_task(child_corpus, chunks, chunkpairs, keep_all=False):
     return utterances
 
 # returns how often the chunkpair has been seen
-##TODO: Fix this function: do separate comparison on chunkpair[0] vs chunkpairs.all[i].ortho[0] and
-##TODO: chunkpair[1] and chunkpairs.all[i].ortho[1]. Perhaps also need to adjust how this chunkpair is formed
-##TODO: in def production_task
 def determine_pc(chunkpair, chunkpairs):
-    print "chunkpair"
-    print chunkpair
     for i in range(0, chunkpairs.size):
-        temp = []
-        #temp_1 = []
+        temp_0 = []
+        temp_1 = []
         # convert representation
         if isinstance(chunkpairs.all[i].ortho[0], Chunk):
-            temp += chunkpairs.all[i].ortho[0].ortho
+            temp_0 += chunkpairs.all[i].ortho[0].ortho
         else:
-            temp += chunkpairs.all[i].ortho[0]
+            temp_0 += chunkpairs.all[i].ortho[0]
         if isinstance(chunkpairs.all[i].ortho[1], Chunk):
-            temp += chunkpairs.all[i].ortho[1].ortho
+            temp_1 += chunkpairs.all[i].ortho[1].ortho
         else:
-            temp += chunkpairs.all[i].ortho[1]
-
-        if chunkpair == temp:# and chunkpair[1] == temp_1:
-            print "match found"
-            print chunkpair
-            print temp
-            print"----"
+            temp_1 += chunkpairs.all[i].ortho[1]
+        if chunkpair[0] == temp_0 and chunkpair[1] == temp_1:
             return chunkpairs.all[i].count
     return 0
 
@@ -556,7 +541,9 @@ def evaluate_and_save(utterances, child, age, output_filename):
             utterance = utterances.all[i].ortho
             num = utterances.all[i].num
             skip = utterances.all[i].skipped
-            bow = utterances.all[i].bag_of_chunks
+            bow = []  
+            for chunk in utterances.all[i].bag_of_chunks:
+            	bow.append(chunk.ortho)
             # if utterance was not skipped because of lack of matching chunks, check if it was reconstructed correctly
             if not skip:
                 true_temp = ""
@@ -584,9 +571,11 @@ def evaluate_and_save(utterances, child, age, output_filename):
                     controlledscore = np.math.log(1 - (1/np.math.factorial(n_chunks)))
             # if utterance was skipped, set all irrelevant variables to NaN
             else:
-                gold = 'NaN'
+            	for j in range(0, len(utterance)):
+                    true_temp += str(utterance[j].ortho)
+                gold = true_temp  #CHANGE THIS ONE
                 prediction = 'NaN'
-                bow = 'NaN'
+                bow = 'NaN' 
                 reconstructed = 'NaN'
                 chance = 'NaN'
                 controlledscore = 'NaN'
@@ -615,7 +604,6 @@ def parse_arguments():
             help="keep utterances with previously-unseen words during test")
     return p.parse_args()
 
-"""
 if __name__ == "__main__":
     args = parse_arguments()
 
@@ -693,8 +681,8 @@ if __name__ == "__main__":
     evaluate_and_save(utterances, args.child, args.age, output_filename)
 
     print("Program done")
-"""
 
+"""
 if __name__ == "__main__":
     #change path of location of corpusfiles
     path = os.path.abspath('')
@@ -702,9 +690,9 @@ if __name__ == "__main__":
     #path = os.path.join(path, 'Data')
 
     ##A DJUST THESE TO SELECT CORPUS DATA ###
-    TYPE = "l" # c or "l"
+    TYPE = "c" # c or "l"
     CHILD = "Alex" # Choose between Alex, Ethan, Lily, Naima, Violet and William for Providence corpus, or ArtLg for Artificial Grammar
-    AGE = "2_6" #  Choose between 1_6, 2_0, 2_6, 3_0, 3_ or 4_0 for Providence corpus or NVT for Artificial Grammar
+    AGE = "3_6" #  Choose between 1_6, 2_0, 2_6, 3_0, 3_ or 4_0 for Providence corpus or NVT for Artificial Grammar
     if TYPE == "c":
         LOC = os.path.join(path, 'cumulativesampledcorpus')
     else:
@@ -723,7 +711,7 @@ if __name__ == "__main__":
     NUM_CHUNKS = NUM_PAIRS
     NUM_FRAMES = NUM_PAIRS
 
-    #NUM_UTTERANCES = min(5000, NUM_UTTERANCES)  # for testing code with subset of data
+    NUM_UTTERANCES = min(2000, NUM_UTTERANCES)  # for testing code with subset of data
     print NUM_UTTERANCES
 
     print("\nFile read")
@@ -739,3 +727,4 @@ if __name__ == "__main__":
     print("\nProduction task completed")
     #evaluate_and_save(utterances)
     #print("Program done")
+"""
