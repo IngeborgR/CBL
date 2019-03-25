@@ -820,6 +820,7 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
   invisible(combined)
 }
 
+#TODO: How to make these two graphs of similar sizes, even though only the right one has a legend (plus, the legend looks funky)
 plot.local.uttlength <- plot.local.uttlength + theme_apa(x.font.size = 18, y.font.size = 18,
                                                                    legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
                                                                    )
@@ -835,6 +836,7 @@ plot.both.factors <- grid.arrange(plot.local.uttlength, plot.both.repetitions_pe
 dev.off()
 plot.both.factors
 
+#TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
 plot.local.reconstruction <- plot.local.reconstruction + theme_apa(x.font.size = 18, y.font.size = 18,
                                                                    legend.font.size = 18) + theme(legend.key.width = unit(2, "cm"), axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
                                                                    )
@@ -851,6 +853,7 @@ plot.both.reconstruction <- grid_arrange_shared_legend(plot.local.reconstruction
 dev.off()
 plot.both.reconstruction
 
+#TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
 plot.local.reconstruction_perc <- plot.local.reconstruction_perc + theme_apa(x.font.size = 18, y.font.size = 18,
                                                                    legend.font.size = 18) + theme(legend.key.width = unit(2, "cm"),axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
                                                                    )
@@ -867,6 +870,7 @@ plot.both.reconstruction_perc <- grid_arrange_shared_legend(plot.local.reconstru
 dev.off()
 plot.both.reconstruction_perc
 
+#TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
 plot.local.unknown <- plot.local.unknown + theme_apa(x.font.size = 18, y.font.size = 18,
                                                                    legend.font.size = 18) + theme(legend.key.width = unit(2, "cm"),axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
                                                                    )
@@ -899,6 +903,7 @@ plot.both.reconstruction_numwords <- grid.arrange(plot.local.reconstruction_numw
 dev.off()
 plot.both.reconstruction_numwords
 
+#TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
 plot.local.repetitions_perc <- plot.local.repetitions_perc  + theme_apa(x.font.size = 18, y.font.size = 18,
                                                                                      legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
                                                                                      )
@@ -915,6 +920,7 @@ plot.both.repetitions_perc  <- grid.arrange(plot.local.repetitions_perc , plot.c
 dev.off()
 plot.both.repetitions_perc 
 
+#TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
 plot.local.repetitions_abs <- plot.local.repetitions_abs  + theme_apa(x.font.size = 18, y.font.size = 18,
                                                                         legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
                                                                         )
