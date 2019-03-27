@@ -98,7 +98,7 @@ plot.local.repetitions_perc <- ggplot(plotdata4,
   ylab("Percentage of utterances\n containing repetitions\n") + 
   ggtitle("Local sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -119,7 +119,7 @@ plot.local.repetitions_abs <- ggplot(plotdata4,
   ylab("Number of utterances\n containing repetitions\n") + 
   ggtitle("Local sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -146,7 +146,7 @@ plot.local.reconstruction_numwords <- ggplot(data = plotdata_1,
   ylab("Percentage correctly\n reconstructed utterances\n") + 
   ggtitle("Local sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -175,7 +175,7 @@ plot.local.reconstruction_perc <- ggplot(plotdata4,
   ylab("Percentage correctly\n reconstructed utterances\n") + 
   ggtitle("Local sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -203,9 +203,9 @@ plot.local.reconstruction <- ggplot(plotdata,
   xlab("\nAge (years)") + 
   ylab("Average reconstruction \nscore\n") + 
   ggtitle("Local sampling") + 
-  geom_hline(yintercept=0)
+  geom_hline(yintercept=0) +
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -261,7 +261,7 @@ plot.local.repetitions_perc_collapsed <- ggplot(plotdata_local,
   ylab("Percentage of utterances\n containing repetitions\n") + 
   #ggtitle("Local sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -346,7 +346,7 @@ plot.cumu.repetitions_perc <- ggplot(plotdata4,
   ylab("Percentage of utterances\n containing repetitions\n") + 
   ggtitle("Cumulative sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -367,7 +367,7 @@ plot.cumu.repetitions_abs <- ggplot(plotdata4,
   ylab("Number of utterances\n containing repetitions\n") + 
   ggtitle("Cumulative sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -394,7 +394,7 @@ plot.acc.reconstruction_numwords <- ggplot(data = plotdata_1,
   ylab("Percentage correctly\n reconstructed utterances\n") + 
   ggtitle("Cumulative sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -423,7 +423,7 @@ plot.acc.reconstruction_perc <- ggplot(plotdata4,
   ylab("Percentage correctly\n reconstructed utterances\n") + 
   ggtitle("Cumulative sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -451,9 +451,9 @@ plot.acc.reconstruction <- ggplot(plotdata,
   xlab("\nAge (years)") + 
   ylab("Average reconstruction \nscore\n") + 
   ggtitle("Cumulative sampling") + 
-  geom_hline(yintercept=0)
+  geom_hline(yintercept=0) +
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -508,7 +508,7 @@ plot.cumulative.repetitions_perc_collapsed <- ggplot(plotdata_cumu,
   ylab("Percentage of utterances\n containing repetitions\n") + 
   #ggtitle("Cumulative sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -521,17 +521,17 @@ plot.cumulative.repetitions_perc_collapsed+theme_apa()
 
 #COMBINE LOCAL + CUMULATIVE PLOTS
 plot.both.repetitions_perc_collapsed <- ggplot() +
-  geom_line(data = plotdata_local, aes(x=age, y = percentages, color = "local")) +
-  geom_line(data = plotdata_cumu, aes(x=age, y = percentages, color = "cumulative")) + 
+  geom_line(data = plotdata_local, aes(x=age, y = percentages, color = "local"), lwd = 2) +
+  geom_line(data = plotdata_cumu, aes(x=age, y = percentages, color = "cumulative"), lwd = 2) + 
   geom_line(size = 1.5) + basic.theme + theme(axis.text.x = element_text(size=22)) +
-  #scale_colour_manual(name = "Child:", values = groupcolours) + 
   coord_cartesian(ylim=(c(0,50))) + 
   xlab("\nAge (years)") + 
   ylab("Percentage of utterances\n containing repetitions\n") + 
   ggtitle("Chunk repetitions in child utterances") + 
   guides(color = guide_legend(reverse = TRUE)) +
-  basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  basic.theme + theme(axis.text.x = element_text(size=22)) +
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt"))) +
+  guides(color=guide_legend(title="Sample"))
 
 #Save plot
 png(paste(plot.path,
@@ -596,7 +596,7 @@ plot.local.unknown <- ggplot(total,
   ylab("% Utterances containing \nnew words\n") + 
   ggtitle("Local sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 
 #Save plot
@@ -668,7 +668,7 @@ plot.acc.unknown <- ggplot(total,
   ylab("% Utterances containing \nnew words\n") + 
   ggtitle("Cumulative sampling") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 
 #Save plot
@@ -728,7 +728,7 @@ plot.local.uttlength <- ggplot(plotdata_local_uttlength,
   ylab("Average number of words \n in child utterance\n") + 
   ggtitle("Child utterance length ") + 
   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-  theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+  theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 
 #Save plot
 png(paste(plot.path,
@@ -777,7 +777,7 @@ plot.local.uttlength+theme_apa()
 #   ylab("Average number of words \n in child utterance\n") + 
 #   #ggtitle("Local sampling") + 
 #   basic.theme + theme(axis.text.x = element_text(size=22)) + 
-#   theme(plot.title = element_text(size=32, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
+#   theme(plot.title = element_text(size=30, face = "bold.italic", hjust = 0.5, margin=margin(b = 30, unit = "pt")))
 # 
 # #Save plot
 # png(paste(plot.path,
@@ -820,72 +820,153 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
   invisible(combined)
 }
 
+arrange_related_x_axes <- function(..., nrow=NULL, ncol=NULL, as.table=FALSE, 
+                    main=NULL, sub=NULL, plot=TRUE) { 
+  dots <- list(...) 
+  n <- length(dots) 
+  if(is.null(nrow) & is.null(ncol)) { nrow = floor(n/2) ; ncol = ceiling(n/nrow)} 
+  if(is.null(nrow)) { nrow = ceiling(n/ncol)} 
+  if(is.null(ncol)) { ncol = ceiling(n/nrow)} 
+  fg <- frameGrob(layout=grid.layout(nrow,ncol)) 
+  ii.p <- 1 
+  for(ii.row in seq(1, nrow)){ 
+    ii.table.row <- ii.row       
+    if(as.table) {ii.table.row <- nrow - ii.table.row + 1} 
+    for(ii.col in seq(1, ncol)){ 
+      ii.table <- ii.p 
+      if(ii.p > n) break 
+      fg <- placeGrob(fg, ggplotGrob(dots[[ii.table]]), 
+                      row=ii.table.row, col=ii.col) 
+      ii.p <- ii.p + 1 
+    } 
+  } 
+  if(!is.null(main) | !is.null(sub)){ 
+    g <- frameGrob() # large frame to place title(s) and content 
+    g <- packGrob(g, fg) 
+    if (!is.null(main)) 
+      g <- packGrob(g, textGrob(main), side="top") 
+    if (!is.null(sub)) 
+      g <- packGrob(g, textGrob(sub, gp=gpar(fontsize=30), vjust=-1, hjust=0), side="bottom") 
+  } else { 
+    g <- fg 
+  } 
+  if(plot) grid.draw(g) 
+  invisible(g) 
+} 
+
 #TODO: How to make these two graphs of similar sizes, even though only the right one has a legend (plus, the legend looks funky)
-plot.local.uttlength <- plot.local.uttlength + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                                   legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                                   )
-plot.both.repetitions_perc_collapsed <- plot.both.repetitions_perc_collapsed + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                               legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                               )plot.both.factors <- grid.arrange(plot.local.uttlength, plot.both.repetitions_perc_collapsed, nrow = 1)
+# MC: done
+plot.local.uttlength.noxtitle <- plot.local.uttlength +
+  xlab("\n") +
+  ylab("Average number of words\nin child utterance\n") +
+  theme(axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18))
+#  theme_apa(x.font.size = 18, y.font.size = 18, legend.font.size = 18) +
+plot.both.repetitions_perc_collapsed.noxtitle <- plot.both.repetitions_perc_collapsed +
+  xlab("\n") +
+  ylab("\n\nPercentage of utterances\ncontaining repetitions\n") +
+  theme(axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position=c(0.75,0.9))
+#  theme_apa(x.font.size = 18, y.font.size = 18, legend.font.size = 18) +
+
+png(paste(plot.path,
+          "plotbothfactors.png", sep=""),
+    width=1500,height=500,units="px",
+    bg = "transparent")
+grid.newpage()
+arrange_related_x_axes(plot.local.uttlength.noxtitle,
+                       plot.both.repetitions_perc_collapsed.noxtitle,
+                       nrow=1, ncol = 2, as.table=TRUE,
+                       sub="Age (years)")
+dev.off()
+
+#TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
+# MC: done
+plot.local.reconstruction.noxtitle <- plot.local.reconstruction +
+  xlab("\n") +
+  ylab("Average reconstruction score\n") +
+  theme(axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position="none")
+#  theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18) +
+plot.acc.reconstruction.noxtitle <- plot.acc.reconstruction +
+  xlab("\n") +
+  ylab("\n") +
+  theme(legend.key.width = unit(2, "cm"),
+        axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position=c(0.75,0.25))
+#  theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18) +
 
 png(paste(plot.path,
           "plotbothreconstruction.png", sep=""),
-    width=900,height=500,units="px",
+    width=1500,height=700,units="px",
     bg = "transparent")
-plot.both.factors <- grid.arrange(plot.local.uttlength, plot.both.repetitions_perc_collapsed, nrow = 1)
+grid.newpage()
+arrange_related_x_axes(plot.local.reconstruction.noxtitle,
+                       plot.acc.reconstruction.noxtitle,
+                       nrow=1, ncol = 2, as.table=TRUE,
+                       sub="Age (years)")
 dev.off()
-plot.both.factors
 
 #TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
-plot.local.reconstruction <- plot.local.reconstruction + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                                   legend.font.size = 18) + theme(legend.key.width = unit(2, "cm"), axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                                   )
-plot.acc.reconstruction <- plot.acc.reconstruction + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                     legend.font.size = 18) + theme(legend.key.width = unit(2, "cm"), axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                     )
-plot.both.reconstruction <- grid_arrange_shared_legend(plot.local.reconstruction, plot.acc.reconstruction, ncol = 2, nrow = 1, position = "right")
-
-png(paste(plot.path,
-          "plotbothreconstruction.png", sep=""),
-    width=900,height=500,units="px",
-    bg = "transparent")
-plot.both.reconstruction <- grid_arrange_shared_legend(plot.local.reconstruction, plot.acc.reconstruction, ncol = 2, nrow = 1, position = "right")
-dev.off()
-plot.both.reconstruction
-
-#TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
-plot.local.reconstruction_perc <- plot.local.reconstruction_perc + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                                   legend.font.size = 18) + theme(legend.key.width = unit(2, "cm"),axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                                   )
-plot.acc.reconstruction_perc <- plot.acc.reconstruction_perc + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                               legend.font.size = 18) + theme(legend.key.width = unit(2, "cm"),axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                               )
-plot.both.reconstruction_perc <- grid_arrange_shared_legend(plot.local.reconstruction_perc, plot.acc.reconstruction_perc, ncol = 2, nrow = 1, position = "right")
+# MC: done
+plot.local.reconstruction_perc.noxtitle <- plot.local.reconstruction_perc +
+  xlab("\n") +
+  ylab("Percentage correctly\nreconstructed utterances\n") +
+  theme(axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position="none")
+#  theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18) +
+plot.acc.reconstruction_perc.noxtitle <- plot.acc.reconstruction_perc +
+  xlab("\n") +
+  ylab("\n") +
+  theme(legend.key.width = unit(2, "cm"),
+        axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position=c(0.75,0.25))
+#  theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18)
 
 png(paste(plot.path,
           "plotbothreconstruction_perc.png", sep=""),
-    width=900,height=500,units="px",
+    width=1500,height=700,units="px",
     bg = "transparent")
-plot.both.reconstruction_perc <- grid_arrange_shared_legend(plot.local.reconstruction_perc, plot.acc.reconstruction_perc, ncol = 2, nrow = 1, position = "right")
+grid.newpage()
+arrange_related_x_axes(plot.local.reconstruction_perc.noxtitle,
+                       plot.acc.reconstruction_perc.noxtitle,
+                       nrow=1, ncol = 2, as.table=TRUE,
+                       sub="Age (years)")
 dev.off()
-plot.both.reconstruction_perc
 
 #TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
-plot.local.unknown <- plot.local.unknown + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                                   legend.font.size = 18) + theme(legend.key.width = unit(2, "cm"),axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                                   )
-plot.acc.unknown <- plot.acc.unknown + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                               legend.font.size = 18) + theme(legend.key.width = unit(2, "cm"),axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                               )
-plot.both.unknown <- grid_arrange_shared_legend(plot.local.unknown, plot.acc.unknown, ncol = 2, nrow = 1, position = "right")
+# MC: done
+plot.local.unknown.noxtitle <- plot.local.unknown +
+  xlab("\n") +
+  ylab("% Utterances containing\nnew words\n") +
+  theme(axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position="none")
+#  theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18) +
+plot.acc.unknown.noxtitle <- plot.acc.unknown +
+  xlab("\n") +
+  ylab("\n") +
+  theme(legend.key.width = unit(2, "cm"),
+        axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position=c(0.75,0.8))
+#  theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18) +
 
 png(paste(plot.path,
           "plotbothunknown.png", sep=""),
-    width=900,height=500,units="px",
+    width=1500,height=700,units="px",
     bg = "transparent")
-plot.both.unknown <- grid_arrange_shared_legend(plot.local.unknown, plot.acc.unknown, ncol = 2, nrow = 1, position = "right")
+grid.newpage()
+arrange_related_x_axes(plot.local.unknown.noxtitle,
+                       plot.acc.unknown.noxtitle,
+                       nrow=1, ncol = 2, as.table=TRUE,
+                       sub="Age (years)")
 dev.off()
-plot.both.unknown
 
 plot.local.reconstruction_numwords <- plot.local.reconstruction_numwords + theme_apa(x.font.size = 18, y.font.size = 18,
                                                                legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
@@ -904,35 +985,59 @@ dev.off()
 plot.both.reconstruction_numwords
 
 #TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
-plot.local.repetitions_perc <- plot.local.repetitions_perc  + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                                                     legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                                                     )
-plot.cumu.repetitions_perc  <- plot.cumu.repetitions_perc + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                                                 legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                                                 )
-plot.both.repetitions_perc  <- grid.arrange(plot.local.repetitions_perc , plot.cumu.repetitions_perc , ncol=2)#grid_arrange_shared_legend(plot.local.reconstruction_numwords, plot.acc.reconstruction_numwords, ncol = 2, nrow = 1)#, position = "right")
+# MC: done
+plot.local.repetitions_perc.noxtitle <- plot.local.repetitions_perc +
+  xlab("\n") +
+  ylab("% Utterances containing\nrepetitions\n") +
+  theme(axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position="none")
+#  theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18) +
+plot.cumu.repetitions_perc.noxtitle <- plot.cumu.repetitions_perc +
+  xlab("\n") +
+  ylab("\n") +
+  theme(legend.key.width = unit(2, "cm"),
+        axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position=c(0.75,0.8))
+#  theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18) +
 
 png(paste(plot.path,
-          "plotboth_repetitions_perc .png", sep=""),
-    width=900,height=500,units="px",
+          "plotboth_repetitions_perc.png", sep=""),
+    width=1500,height=700,units="px",
     bg = "transparent")
-plot.both.repetitions_perc  <- grid.arrange(plot.local.repetitions_perc , plot.cumu.repetitions_perc , ncol=2)
+grid.newpage()
+arrange_related_x_axes(plot.local.repetitions_perc.noxtitle,
+                       plot.cumu.repetitions_perc.noxtitle,
+                       nrow=1, ncol = 2, as.table=TRUE,
+                       sub="Age (years)")
 dev.off()
-plot.both.repetitions_perc 
 
 #TODO: Remove axes-labels from right plot without distorting the individual graphs' sizes.
-plot.local.repetitions_abs <- plot.local.repetitions_abs  + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                                        legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                                        )
-plot.cumu.repetitions_abs  <- plot.cumu.repetitions_abs + theme_apa(x.font.size = 18, y.font.size = 18,
-                                                                      legend.font.size = 18) + theme(axis.text.x = element_text(size=18),axis.text.y = element_text(size=18)
-                                                                      )
-plot.both.repetitions_abs  <- grid.arrange(plot.local.repetitions_abs , plot.cumu.repetitions_abs , ncol=2)#grid_arrange_shared_legend(plot.local.reconstruction_numwords, plot.acc.reconstruction_numwords, ncol = 2, nrow = 1)#, position = "right")
+# MC: done
+plot.local.repetitions_abs.noxtitle <- plot.local.repetitions_abs +
+  xlab("\n") +
+  ylab("Number of utterances\ncontaining repetitions\n") +
+  theme(axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position="none")
+#  theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18) +
+plot.cumu.repetitions_abs.noxtitle  <- plot.cumu.repetitions_abs +
+  xlab("\n") +
+  ylab("\n") +
+  theme(legend.key.width = unit(2, "cm"),
+        axis.text.x = element_text(size=18),
+        axis.text.y = element_text(size=18),
+        legend.position=c(0.75,0.8))
+#    theme_apa(x.font.size = 18, y.font.size = 18,legend.font.size = 18) +
 
 png(paste(plot.path,
-          "plotboth_repetitions_abs .png", sep=""),
-    width=900,height=500,units="px",
+          "plotboth_repetitions_abs.png", sep=""),
+    width=1500,height=700,units="px",
     bg = "transparent")
-plot.both.repetitions_abs  <- grid.arrange(plot.local.repetitions_abs , plot.cumu.repetitions_abs , ncol=2)
+grid.newpage()
+arrange_related_x_axes(plot.local.repetitions_abs.noxtitle,
+                       plot.cumu.repetitions_abs.noxtitle,
+                       nrow=1, ncol = 2, as.table=TRUE,
+                       sub="Age (years)")
 dev.off()
-plot.both.repetitions_abs
